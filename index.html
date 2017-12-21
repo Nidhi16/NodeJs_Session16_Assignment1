@@ -26,7 +26,7 @@
                 <p> Room Id: <span id="room-name">Unavailable</span></p>
                 <input type="text" class="chat-name" name="chatName" placeholder="Enter your name">
                 <div id="all-messages"></div>
-                <textarea id="text-area" placeholder="Type your message"></textarea>
+                <textarea id="text-area" placeholder="Type your message only on connecting to at least one room" disabled></textarea>
             </div>
         </div>
     </div>
@@ -44,6 +44,9 @@
         $('#roomForm').submit(function (event) {
             event.preventDefault();
             currentRoom = $('input[name=c]').val();
+
+            $('#text-area').prop( "disabled", false );
+            $('#text-area').attr("placeholder", "Type your message");
 
             paraElem = document.createElement('p');
             buttonElem = document.createElement('button');
@@ -74,6 +77,7 @@
 
             socket.emit("connect-to-room", {'room': currentRoom});
             $('input[name=c]').val('');
+
             roomNameElem.innerText = currentRoom;
 
             if(allMessagesElem.innerText !== '') {
