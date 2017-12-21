@@ -34,7 +34,7 @@
     <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
     <script>
         var socket = io();
-        var chatMessages = {};
+        var getChatMessages = {};
         var currentRoom;
         var parentRoomElem = document.getElementById('room-links');
         var roomNameElem = document.getElementById('room-name');
@@ -52,12 +52,22 @@
 
             buttonElem.addEventListener('click', function (event) {
                 var self = this;
-                currentRoom = self.innerText;
-                console.log(currentRoom);
-                roomNameElem.innerText = currentRoom;
-                if (buttonElem.innerHTML !== currentRoom) {
-                    if(allMessagesElem.innerText !== '') {
-                        allMessagesElem.innerText = '';
+
+                if(currentRoom !== self.innerText) {
+
+                    currentRoom = self.innerText;
+                    console.log(currentRoom);
+                    // set the value of room name
+                    roomNameElem.innerText = currentRoom;
+
+                    // fetching msgs from currentroom
+                    var msgs = getChatMessages[currentRoom];
+
+                    allMessagesElem.innerText = '';
+                    if (msgs) {
+                        msgs.forEach(function(msg) {
+                            $('#all-messages').prepend($('<li>').text(msg));
+                        });
                     }
                 }
             });
@@ -87,14 +97,23 @@
         socket.on('chat-messages', function(data) {
             console.log(data);
             var name = data.name;
+            var room = data.roomId;
+            var msg = data.message;
+            var msg_name = name + ": " + msg;
 
-            if (name) {
-                name = data.name;
+            console.log(room);
+            if(room in getChatMessages) {
+                getChatMessages[room].unshift(msg_name);
             } else {
+                getChatMessages[room] = [msg_name];
+            }
+
+            if (!name) {
                 name = "Anonymous";
             }
-            if (currentRoom == data.roomId) {
-                $('#all-messages').append($('<li>').text(name + ": " + data.message));
+            console.log("1", getChatMessages);
+            if (currentRoom == room) {
+                $('#all-messages').append($('<li>').text(name + ": " + msg));
             }
         });
     </script>
