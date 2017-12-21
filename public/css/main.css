@@ -37,3 +37,6 @@ input {
     max-width: 100%;
     outline: none;
 }
+
+#all-messages { list-style-type: none; margin: 0; padding: 0; }
+#all-messages li { padding: 5px 10px; }

@@ -32,11 +32,12 @@ io.on('connection', function (socket) {
         console.log(data);
         var msg = data.messages;
         var room = data.room;
+        var name = data.name;
 
         var socketList = clients[room];
 
         socketList.forEach(function (socket) {
-            socket.emit('chat-messages', {'message': msg, 'roomId': room});
+            socket.emit('chat-messages', {'message': msg, 'roomId': room, 'name':name});
         });
     });
 

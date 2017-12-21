@@ -24,7 +24,7 @@
             <h4>Chat Room</h4>
             <div id="chat">
                 <p> Room Id: <span id="room-name">Unavailable</span></p>
-                <!--<input type="text" class="chat-name" name="name" placeholder="Enter your name">-->
+                <input type="text" class="chat-name" name="chatName" placeholder="Enter your name">
                 <div id="all-messages"></div>
                 <textarea id="text-area" placeholder="Type your message"></textarea>
             </div>
@@ -75,8 +75,9 @@
         var textarea = document.getElementById('text-area');
         textarea.addEventListener('keydown', function (event) {
             var self = this;
+            var name = $('input[name=chatName]').val();
             if (event.which === 13 && event.shiftKey === false) {
-                socket.emit('chat-messages', {'room': currentRoom, 'messages': self.value});
+                socket.emit('chat-messages', {'room': currentRoom, 'messages': self.value, 'name': name});
                 this.value = '';
                 event.preventDefault();
             }
@@ -85,8 +86,15 @@
         // display chat logic
         socket.on('chat-messages', function(data) {
             console.log(data);
+            var name = data.name;
+
+            if (name) {
+                name = data.name;
+            } else {
+                name = "Anonymous";
+            }
             if (currentRoom == data.roomId) {
-                $('#all-messages').append($('<li>').text(data.message));
+                $('#all-messages').append($('<li>').text(name + ": " + data.message));
             }
         });
     </script>
