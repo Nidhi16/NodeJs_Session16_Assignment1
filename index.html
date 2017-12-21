@@ -53,10 +53,12 @@
                 var self = this;
                 currentRoom = self.innerText;
                 console.log(currentRoom);
+                roomNameElem.innerText = currentRoom;
             });
 
             socket.emit("connect-to-room", {'room': currentRoom});
             $('input[name=c]').val('');
+            roomNameElem.innerText = currentRoom;
         });
 
         // Emitting chat logic
