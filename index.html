@@ -38,6 +38,7 @@
         var currentRoom;
         var parentRoomElem = document.getElementById('room-links');
         var roomNameElem = document.getElementById('room-name');
+        var allMessagesElem = document.getElementById('all-messages');
 
         // Room logic
         $('#roomForm').submit(function (event) {
@@ -54,11 +55,20 @@
                 currentRoom = self.innerText;
                 console.log(currentRoom);
                 roomNameElem.innerText = currentRoom;
+                if (buttonElem.innerHTML !== currentRoom) {
+                    if(allMessagesElem.innerText !== '') {
+                        allMessagesElem.innerText = '';
+                    }
+                }
             });
 
             socket.emit("connect-to-room", {'room': currentRoom});
             $('input[name=c]').val('');
             roomNameElem.innerText = currentRoom;
+
+            if(allMessagesElem.innerText !== '') {
+                allMessagesElem.innerText = '';
+            }
         });
 
         // Emitting chat logic
