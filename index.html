@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+<body>
+    <div class="container">
+        <div class="col-sm-4">
+            <h4>Chat Room Links</h4>
+            <div class="room">
+                <div id="room-links"></div>
+                <form id="roomForm">
+                    <div class="form-group">
+                        <input class="form-control" id="c" name="c" placeholder="Type room id to join the chat" /><br>
+                        <button type="submit" id="chat-btn" class="btn btn-info">Connect</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="col-sm-8">
+            <h4>Chat Room</h4>
+            <div id="chat">
+                <p> Room Id: <span id="room-name">Unavailable</span></p>
+                <!--<input type="text" class="chat-name" name="name" placeholder="Enter your name">-->
+                <div id="all-messages"></div>
+                <textarea id="text-area" placeholder="Type your message"></textarea>
+            </div>
+        </div>
+    </div>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://code.jquery.com/jquery-1.11.1.js"></script>
+    <script>
+        var socket = io();
+        var chatMessages = {};
+        var currentRoom;
+        var parentRoomElem = document.getElementById('room-links');
+        var roomNameElem = document.getElementById('room-name');
+
+        // Room logic
+        $('#roomForm').submit(function (event) {
+            event.preventDefault();
+            currentRoom = $('input[name=c]').val();
+
+            paraElem = document.createElement('p');
+            buttonElem = document.createElement('button');
+            buttonElem.innerText = currentRoom;
+            parentRoomElem.appendChild(paraElem).appendChild(buttonElem);
+
+            buttonElem.addEventListener('click', function (event) {
+                var self = this;
+                currentRoom = self.innerText;
+                console.log(currentRoom);
+            });
+
+            socket.emit("connect-to-room", {'room': currentRoom});
+            $('input[name=c]').val('');
+        });
+
+        // Emitting chat logic
+        var textarea = document.getElementById('text-area');
+        textarea.addEventListener('keydown', function (event) {
+            var self = this;
+            if (event.which === 13 && event.shiftKey === false) {
+                socket.emit('chat-messages', {'room': currentRoom, 'messages': self.value});
+                this.value = '';
+                event.preventDefault();
+            }
+        });
+
+        // display chat logic
+        socket.on('chat-messages', function(data) {
+            console.log(data);
+            if (currentRoom == data.roomId) {
+                $('#all-messages').append($('<li>').text(data.message));
+            }
+        });
+    </script>
+</body>
+</html>
